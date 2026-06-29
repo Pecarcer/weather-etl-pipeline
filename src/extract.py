@@ -4,27 +4,16 @@ import logging
 import os
 from datetime import date, timedelta
 
-# -----------------------------------------------------------------------------
-# CONFIGURACIÓN DEL SISTEMA DE LOGS
-# Logging es como un "print inteligente": cada mensaje lleva timestamp y nivel
-# (INFO = informativo, ERROR = algo ha fallado). En pipelines reales es
-# imprescindible para saber qué pasó y cuándo sin tener que depurar a ciegas.
-# -----------------------------------------------------------------------------
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# -----------------------------------------------------------------------------
-# CONSTANTES DE CONFIGURACIÓN
-# Se definen arriba del todo para que sean fáciles de encontrar y cambiar.
-# En proyectos reales estos valores vendrían de un fichero .env o de variables
-# de entorno, nunca hardcodeados en medio del código.
-# -----------------------------------------------------------------------------
 LATITUDE = 37.26          # Latitud de Huelva
 LONGITUDE = -6.95         # Longitud de Huelva
 START_DATE = "2020-01-01"
-END_DATE = str(date.today() - timedelta(days=1)) # Calcula la fecha de hoy automáticamente
+END_DATE = str(date.today() - timedelta(days=1)) # Fecha de ayer
 
 # Variables meteorológicas que queremos. Las unimos con coma en un solo string
 # porque la API de Open-Meteo no acepta el parámetro repetido varias veces.
@@ -40,22 +29,11 @@ DAILY_VARIABLES = ",".join([
 OUTPUT_PATH = "data/raw/huelva_weather_raw.csv"
 
 
-# -----------------------------------------------------------------------------
-# FUNCIÓN 1: EXTRACCIÓN — llama a la API y devuelve el JSON crudo
-# Separar extracción, transformación y carga en funciones distintas es el
-# patrón ETL estándar. Cada función hace UNA sola cosa.
-# -----------------------------------------------------------------------------
 def fetch_weather_data():
     """Llama al endpoint histórico de Open-Meteo y devuelve el JSON de respuesta."""
 
-    # Base de la URL — los parámetros simples van aquí normalmente,
-    # pero como la API no acepta comas codificadas (%2C), construimos
-    # toda la URL como string en lugar de usar el dict params de requests.
     base_url = "https://archive-api.open-meteo.com/v1/archive"
 
-    # Construimos la query string manualmente para que las comas lleguen
-    # literalmente y no codificadas. requests.get() con 'params=' las
-    # convertiría en %2C, lo que rompe esta API concreta.
     query = (
         f"latitude={LATITUDE}"
         f"&longitude={LONGITUDE}"
@@ -68,11 +46,9 @@ def fetch_weather_data():
     url = f"{base_url}?{query}"
 
     logging.info(f"Llamando a la API de Open-Meteo para Huelva ({START_DATE} → {END_DATE})...")
-    logging.info(f"URL: {url}")  # Útil para depurar — verás la URL exacta que se envía
+    logging.info(f"URL: {url}")  
 
     try:
-        # Al pasar la URL completa sin el argumento 'params=',
-        # requests no toca ni codifica nada — la envía tal cual
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         logging.info("Respuesta recibida correctamente.")
@@ -90,7 +66,7 @@ def fetch_weather_data():
 
 
 # -----------------------------------------------------------------------------
-# FUNCIÓN 2: TRANSFORMACIÓN — convierte el JSON crudo en un DataFrame limpio
+# PARSEO — convierte el JSON crudo en un DataFrame limpio
 # La API devuelve un dict con clave "daily" que contiene listas paralelas:
 # {"time": ["2020-01-01", ...], "temperature_2m_max": [16.2, ...], ...}
 # pd.DataFrame() las convierte directamente en columnas.
@@ -121,7 +97,7 @@ def parse_to_dataframe(data):
 
 
 # -----------------------------------------------------------------------------
-# FUNCIÓN 3: CARGA — persiste el DataFrame como CSV en el sistema de ficheros
+# CARGA — persiste el DataFrame como CSV en el sistema de ficheros
 # En la semana 2 esta función cambiará para escribir directamente a Snowflake.
 # Por ahora, CSV en disco es nuestra "capa de almacenamiento".
 # -----------------------------------------------------------------------------
@@ -136,12 +112,7 @@ def save_raw(df):
     logging.info(f"CSV guardado en: {OUTPUT_PATH} ({len(df)} filas)")
 
 
-# -----------------------------------------------------------------------------
-# PUNTO DE ENTRADA
-# El bloque "if __name__ == '__main__'" solo se ejecuta cuando lanzas el script
-# directamente (python src/extract.py). Si otro módulo importara este fichero,
-# este bloque no se ejecutaría — eso es lo que lo hace seguro de importar.
-# -----------------------------------------------------------------------------
+
 if __name__ == "__main__":
     raw_data = fetch_weather_data()
     df = parse_to_dataframe(raw_data)
