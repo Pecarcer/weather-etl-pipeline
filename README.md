@@ -18,12 +18,14 @@ Open-Meteo API → extract.py → [data/raw/] → transform.py → [data/process
 
 ## Stack tecnológico
 
-| Librería       | Uso                                  |
-| -------------- | ------------------------------------ |
-| **pandas**     | Transformación y agregación de datos |
-| **requests**   | Extracción desde API REST            |
-| **matplotlib** | Visualización en EDA                 |
-| **Jupyter**    | Análisis exploratorio                |
+| Librería                       | Uso                                          |
+| ------------------------------ | -------------------------------------------- |
+| **Pandas**                     | Transformación y agregación de datos         |
+| **Requests**                   | Extracción desde API REST                    |
+| **Matplotlib**                 | Visualización en EDA                         |
+| **Jupyter**                    | Análisis exploratorio                        |
+| **Snowflake-connector-python** | Carga directa a Snowflake                    |
+| **Dbt-snowflake**              | Modelado, tests y documentación en Snowflake |
 
 ---
 
