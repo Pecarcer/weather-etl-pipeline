@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: int_daily_weather_enriched
+    description: "Dataset diario enriquecido con columnas derivadas: estación, rango térmico y categoría de lluvia"
+    columns:
+      - name: date
+        description: "Fecha del registro"
+        tests:
+          - not_null
+          - unique
+
+      - name: season
+        description: "Estación del año"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["Invierno", "Primavera", "Verano", "Otoño"]
+
+      - name: rain_category
+        description: "Categoría de precipitación"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                [
+                  "Sin lluvia",
+                  "Inapreciable",
+                  "Lluvia débil",
+                  "Lluvia moderada",
+                  "Lluvia intensa",
+                ]
+
+      - name: temp_range
+        description: "Diferencia entre temperatura máxima y mínima del día"
+        tests:
+          - not_null

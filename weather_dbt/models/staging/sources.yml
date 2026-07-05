@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: raw
+    database: WEATHER_DB
+    schema: RAW
+    tables:
+      - name: daily_weather
+        description: "Datos meteorológicos diarios de Huelva cargados por el pipeline Python"
+        columns:
+          - name: date
+            description: "Fecha del registro"
+          - name: temperature_2m_max
+            description: "Temperatura máxima diaria en °C"
+          - name: temperature_2m_min
+            description: "Temperatura mínima diaria en °C"
+          - name: temperature_2m_mean
+            description: "Temperatura media diaria en °C"
+          - name: precipitation_sum
+            description: "Precipitación total del día en mm"
+          - name: wind_speed_10m_max
+            description: "Velocidad máxima del viento en km/h"
+          - name: sunshine_hours
+            description: "Horas de sol del día"

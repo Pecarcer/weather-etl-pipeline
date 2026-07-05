@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_daily_weather
+    description: "Datos meteorológicos diarios de Huelva normalizados desde la fuente raw"
+    columns:
+      - name: date
+        description: "Fecha del registro"
+        tests:
+          - not_null
+          - unique
+
+      - name: temp_max
+        description: "Temperatura máxima diaria en °C"
+        tests:
+          - not_null
+
+      - name: temp_min
+        description: "Temperatura mínima diaria en °C"
+        tests:
+          - not_null
+
+      - name: precipitation_sum
+        description: "Precipitación total en mm"
+        tests:
+          - not_null

@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: mart_monthly_summary
+    description: "Resumen mensual de métricas meteorológicas de Huelva (2020-presente)"
+    columns:
+      - name: year
+        tests:
+          - not_null
+      - name: month
+        tests:
+          - not_null
+      - name: temp_media
+        tests:
+          - not_null
+      - name: precipitacion_total
+        tests:
+          - not_null
+
+  - name: mart_seasonal_summary
+    description: "Resumen de métricas meteorológicas agrupadas por estación del año"
+    columns:
+      - name: season
+        tests:
+          - not_null
+          - unique
+          - accepted_values:
+              values: ["Invierno", "Primavera", "Verano", "Otoño"]
